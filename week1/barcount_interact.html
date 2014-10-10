@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Course Frequency</title>
+		<script type="text/javascript" src="../../d3/d3.min.js"></script>
+		<style type="text/css">
+			
+			
+			.chart text {
+				fill: black;
+				font: 10px sans-serif;
+				text-anchor: middle;
+			}
+			
+			.axis text {
+				font: 10px sans-serif;
+			}
+			
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: #000;
+				shape-rendering: crispEdges;
+			}
+			
+			.x.axis path {
+				display: none;
+			}
+			
+			
+		</style>
+	</head>
+	<body>		
+		<div id="wrapper">
+		<div id="columnA" style="float:left;">
+		<svg class="chart"></svg>
+		</div>
+		<div id="columnB" style="float:left; background-color:lightblue; width:350px; padding:15px;">
+		<h1 id="coursenum" class="coursenum_class">Course Number</h1>
+		<h2 id="coursename" class="coursename_class">Course Name</h2>
+		<p id="coursedesc" class="coursedesc_class">Course description</p>
+		</div>
+		</div>
+		</div>
+		<script type="text/javascript">
+			var margin = {top:20, right:20, bottom:60, left:40};
+			var w = 1100 - margin.left - margin.right;
+			var h = 500 - margin.top - margin.bottom;
+			
+			var yScale = d3.scale.linear()
+							.range([h, 0]);
+			var xScale = d3.scale.ordinal()
+							.rangeRoundBands([0, w], .1);
+			var colorScale = d3.scale.linear()
+								.range([0, 256]);
+							
+			var xAxis = d3.svg.axis()
+							.scale(xScale)
+							.orient("bottom");
+			var yAxis = d3.svg.axis()
+							.scale(yScale)
+							.orient("left");
+			
+			var colb = document.getElementById("columnB");
+			var coursenum = colb.getElementsByClassName("coursenum_class")[0];
+			var coursename = colb.getElementsByClassName("coursename_class")[0];
+			var coursedesc = colb.getElementsByClassName("coursedesc_class")[0];
+		
+			var curselection;
+			var prev_color;
+			
+			var chart = d3.select(".chart")
+				.attr("width", w + margin.left + margin.right)
+				.attr("height", h + margin.top + margin.bottom)
+				.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				
+			//dataset = d3.csv("coursehistory2014.csv");
+			d3.csv("../data/coursehistory2014_descs.csv", function(data) {
+				yScale.domain([0, d3.max(data, function(d) { return d.Count; })]);
+				xScale.domain(data.map(function(d) {return d.Course; }));
+				colorScale.domain([0, d3.max(data, function(d) { return d.Count; })]);
+				
+				chart.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + h + ")")
+					.call(xAxis)
+						.selectAll("text")
+						.attr("dx", "-3.18em")
+						.attr("dy", "-.55em")
+						.attr("transform", function (d) {
+						return "rotate(-90)"
+						});
+					
+				chart.append("g")
+					.attr("class", "y axis")
+					.call(yAxis);
+				
+				chart.selectAll(".bar")
+					.data(data)
+					.enter()
+					.append("rect")
+					.attr("class", "bar")
+					.attr("x", function(d) { return xScale(d.Course); })
+					.attr("y", function(d) { return yScale(d.Count); })
+					.attr("height", function(d) { return h - yScale(d.Count); })
+					.attr("width", xScale.rangeBand())
+					.attr("fill", function(d) {
+						return "rgb(0, 150, " + Math.floor(colorScale(d.Count)) + ")";
+					});
+				
+				var allbars = chart.selectAll(".bar");
+				
+				curselection = d3.select(allbars[0][4]);
+				console.log(curselection);
+				curselection.attr("fill", "yellow");
+				coursenum.innerHTML = curselection.data()[0].Course;
+				coursename.innerHTML = curselection.data()[0].Name;
+				coursedesc.innerHTML = curselection.data()[0].Desc;
+				
+				
+				chart.selectAll("rect")
+					.on("click", function(d) {
+						console.log(d);
+						curselection.transition().ease("out").duration(300).attr("fill", function(d) {
+						return "rgb(0, 150, " + Math.floor(colorScale(d.Count)) + ")";
+						});
+						var selection = d3.select(this);
+						selection.attr("fill", "rgb(255,255,0)");
+						curselection = selection;
+						coursenum.innerHTML = d.Course;
+						coursename.innerHTML = d.Name;
+						coursedesc.innerHTML = d.Desc;
+						}
+				);
+				
+			});
+			
+			
+			
+		</script>
+	</body>
+</html>
