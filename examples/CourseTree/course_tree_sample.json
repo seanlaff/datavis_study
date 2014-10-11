@@ -1,0 +1,70 @@
+{
+    "name": "John Doe",
+    "children": [{
+        "name": "2009 Fall",
+        "children": [{
+            "name": "ACCT 207",
+         
+            "size": 743
+        }, {
+            "name": "COMM 212",
+            
+                "size": 3416
+            
+        }, {
+            "name": "HIST 205",
+            
+                "size": 7074
+            }
+        ]
+    }, {
+        "name": "2010 Fall",
+        "children": [{
+            "name": "ACCT 208",
+            "size": 17010
+        }, {
+            "name": "ANTH 104",
+            "size": 5842
+        }, {
+            "name": "ECON 302",
+            "size": 3452
+            
+        }, {
+            "name": "MATH 201",
+            "size": 1041
+        
+        }]
+    }, {
+        "name": "2012 Fall",
+        "children": [{
+            "name": "BUAD 301",
+            "size":2134
+        }, {
+            "name": "BUAD 306",
+            "size": 1759
+        }, {
+            "name": "ECON 251",
+            "size": 2165
+        }, {
+            "name": "MATH 202",
+            "size": 586
+        }
+        ]
+    }, {
+        "name": "2013 Fall",
+        "children": [{
+            "name": "ACCT 415",
+            "size": 8833
+        }, {
+            "name": "ACCT 417",
+            "size": 1732
+        }, {
+            "name": "FINC 412",
+            "size": 3623
+        }, {
+            "name": "ACCT 425",
+            "size": 10066
+        }]
+    }
+    ]
+}
