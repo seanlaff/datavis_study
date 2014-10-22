@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Pie Chart</title>
+		<script type="text/javascript" src="../../d3/d3.min.js"></script>
+		<style type="text/css">
+			
+
+		</style>
+	</head>
+	<body>		
+		<div id="wrapper">
+		<div id="columnA" style="float:left;">
+		<svg class="chart"></svg>
+		</div>
+		<div id="columnB" style="float:left; background-color:lightblue; width:350px; padding:15px;">
+		<h1 id="coursenum" class="coursenum_class">Course Number</h1>
+		<h2 id="coursename" class="coursename_class">Course Name</h2>
+		<p id="coursedesc" class="coursedesc_class">Course description</p>
+		</div>
+		</div>
+		</div>
+		<script type="text/javascript">
+			var margin = {top:20, right:20, bottom:20, left:20};
+			var w = 600 - margin.left - margin.right;
+			var h = 600 - margin.top - margin.bottom;
+			
+			var outerRadius = w / 2;
+			var innerRadius = w/4;
+			
+			var arc = d3.svg.arc()
+				.innerRadius(innerRadius)
+				.outerRadius(outerRadius);
+			
+			var color = d3.scale.category10();
+			
+			var pie = d3.layout.pie()
+							.value(function(d) {
+							return d.freq;
+							})
+							.sort(null);
+
+			var colb = document.getElementById("columnB");
+			var coursenum = colb.getElementsByClassName("coursenum_class")[0];
+			var coursename = colb.getElementsByClassName("coursename_class")[0];
+			var coursedesc = colb.getElementsByClassName("coursedesc_class")[0];
+		
+			var chart = d3.select(".chart")
+				.attr("width", w + margin.left + margin.right)
+				.attr("height", h + margin.top + margin.bottom)
+				.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				
+			//dataset = d3.csv("coursehistory2014.csv");
+			d3.json("../data/2012_semesters_json.js", function(data) {
+				
+				console.log(data);
+				//console.log(data[0]);
+				//console.log(data[0].semdata);
+				//console.log(pie(data));
+				
+				//console.log(data[1]);
+				var arcs = chart.selectAll("g.arc")
+					.data(pie(data[0].semdata), key)
+					.enter()
+					.append("g")
+					.attr("class", "arc")
+					.attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+				
+				console.log(arcs);
+				
+				arcs.append("path")
+					.attr("fill", function(d, i) {
+						return color(i);
+					})
+					.attr("d", arc)
+					.each(function(d) { this._current = d; });
+					
+				arcs.append("text")
+					.attr("transform", function(d) {
+						return "translate(" + arc.centroid(d) + ")";
+					})
+					.attr("text-anchor", "middle")
+					.text(function(d) {
+						return d.data.term;
+				});
+				
+				chart.selectAll("g.arc")
+					.on("click", function(d) {
+						changeData();	
+						});
+						
+				var changeData = function() {
+					arcs.data(pie(data[1].semdata), key)
+					.select("path")
+					.transition()
+					.duration(1000)
+					.attrTween("d", arcTween);
+					
+					arcs.select("text")
+					.attr("transform", function(d) {
+						return "translate(" + arc.centroid(d) + ")";
+					})
+					.attr("text-anchor", "middle")
+					.text(function(d) {
+						return d.data.term;
+				});
+					}
+					
+			});
+			
+			var key = function(d) {
+				return d.data.term;
+			}
+			
+			function arcTween(a) {
+			console.log(this._current);
+				var i = d3.interpolate(this._current, a);
+				this._current = i(0);
+				return function(t) {
+					return arc(i(t));
+				};
+			}
+			
+			
+		</script>
+	</body>
+</html>
